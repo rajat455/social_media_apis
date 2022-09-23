@@ -20,6 +20,12 @@ class UserController {
             if (!UserInfo.last_name) {
                 return res.status(400).send({ message: "Missing depandency last_name" })
             }
+            let username =  randomstring.generate({
+                length: 2,
+                charset: "numeric"
+            })
+            username = UserInfo.first_name.toLowerCase() + "_" + UserInfo.last_name.toLowerCase() + "@" + username
+            UserInfo.username = username
             const createUser = await addNew(UserInfo)
             if (createUser) {
                 const otp = randomstring.generate({
@@ -64,7 +70,6 @@ class UserController {
             }
             return res.status(500).send({ message: "OTP expired" })
         } catch (err) {
-
             return res.status(500).send({ message: "Internal server error", err: err.message })
         }
     }
