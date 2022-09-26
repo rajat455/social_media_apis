@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken")
 
-const JWT_SECRATE = "somthing"
+const JWT_SECRATE = process.env.JWT_SECRATE
 module.exports =  new class AuthConroller {
     constructor(){
     }

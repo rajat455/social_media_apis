@@ -71,6 +71,7 @@ class UserController {
             }
             return res.status(500).send({ message: "OTP expired" })
         } catch (err) {
+            console.log(err)
             return res.status(500).send({ message: "Internal server error", err: err.message })
         }
     }

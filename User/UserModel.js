@@ -5,19 +5,19 @@ const Prisma = new PrismaClient()
 class UserModel {
     constructor() { }
 
-    async addNew(data) {
-        return await Prisma.user.create({
+    addNew(data) {
+        return Prisma.user.create({
             data: {
                 first_name: data.first_name,
                 last_name: data.last_name,
                 email: data.email,
-                username:data.username
+                username: data.username
             }
         })
     }
 
-    async NewOtp(otp, user, email) {
-        return await Prisma.otp.create({
+    NewOtp(otp, user, email) {
+        return Prisma.otp.create({
             data: {
                 userid: user,
                 otp: otp,
@@ -26,11 +26,11 @@ class UserModel {
         })
     }
 
-    async GetUser(email) {
+    GetUser(email) {
         let to = new Date()
         let from = new Date()
         from.setMinutes(from.getMinutes() - 1)
-        return await Prisma.otp.findFirst({
+        return Prisma.otp.findFirst({
             select: {
                 otp: true,
                 user: true
@@ -45,17 +45,17 @@ class UserModel {
         })
     }
 
-    async isEmailExist(email){
-        return await Prisma.user.findFirst({
-            where:{
-                email:email
+    isEmailExist(email) {
+        return Prisma.user.findFirst({
+            where: {
+                email: email
             }
         })
     }
 
-    async UploadedFileData(data){
-        return await Prisma.files.createMany({
-            data:data
+    UploadedFileData(data) {
+        return Prisma.files.createMany({
+            data: data
         })
     }
 

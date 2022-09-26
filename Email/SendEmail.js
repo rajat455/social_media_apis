@@ -1,28 +1,30 @@
 const nodemailer = require("nodemailer")
 
+const email = process.env.EMAIL
 class SendEmail {
-    constructor() { }
+    constructor() {
+    }
 
     newEmail(subject, mailText, to) {
-        return  new Promise ((resolve,reject) => {
+        return new Promise((resolve, reject) => {
             let transport = nodemailer.createTransport({
                 host: "smtp.gmail.com",
                 port: 587,
                 secure: false,
                 requireTLS: true,
                 auth: {
-                    user:"rajatjayswal80@gmail.com",
+                    user: email,
                     pass: "fzlbfbiqkhwcyvsg"
                 }
             })
-    
+
             let mailOptions = {
-                from: "rajatjayswal80@gmail.com",
+                from: email,
                 to: to,
                 subject: subject,
                 text: mailText
             }
-    
+
             transport.sendMail(mailOptions, (err, info) => {
                 if (err) {
                     reject(err)
