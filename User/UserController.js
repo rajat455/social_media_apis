@@ -1,8 +1,9 @@
-const { addNew, NewOtp, GetUser, isEmailExist } = require("./UserModel")
+const { addNew, NewOtp, GetUser, isEmailExist, UploadedData, UploadedFileData } = require("./UserModel")
 var randomstring = require("randomstring");
 const bcrypt = require('bcrypt');
 const { newEmail } = require("../Email/SendEmail");
 const { generateToken } = require("../Authontication/AuthController");
+const { UploadFile } = require("../FileHandler/FileHendler");
 
 
 class UserController {
@@ -20,7 +21,7 @@ class UserController {
             if (!UserInfo.last_name) {
                 return res.status(400).send({ message: "Missing depandency last_name" })
             }
-            let username =  randomstring.generate({
+            let username = randomstring.generate({
                 length: 2,
                 charset: "numeric"
             })
@@ -42,8 +43,8 @@ class UserController {
             }
             return res.status(500).send({ message: "Something Went Wrong With User Creation" })
         } catch (err) {
-            if(err.code === "P2002"){
-                return res.status(500).send({message:"Email allrady exist", err:"Duplicate key_email", code:"P2002"})
+            if (err.code === "P2002") {
+                return res.status(500).send({ message: "Email allrady exist", err: "Duplicate key_email", code: "P2002" })
             }
             return res.status(500).send({ message: "Internal server error", err: err.message })
         }
@@ -74,7 +75,7 @@ class UserController {
         }
     }
 
-    async Login(req,res) {
+    async Login(req, res) {
         try {
             const { email } = req.body
             if (!email) {
@@ -94,14 +95,62 @@ class UserController {
                 }
                 return res.status(500).send({ message: "Something Went Wrong With Otp Varification" })
             }
-            return res.status(404).send({message:"Email not exist", err:"Not Found"})
+            return res.status(404).send({ message: "Email not exist", err: "Not Found" })
 
         } catch (err) {
             console.log(err)
-            return res.status(500).send({message:"Internal server error",err:err.message})
+            return res.status(500).send({ message: "Internal server error", err: err.message })
         }
     }
 
+    async FileUpload(req, res) {
+        try {
+            const File = req.files.file
+            const Path = req.body.path
+            const userid = req.body.userid
+            const purpose = req.body.purpose
+            let result = await UploadFile(File, Path)
+            if (!result.TotalUploadedFile > 0) {
+                return res.status(500).send({ message: "Somthing went wrong in upload file" })
+            }
+            if (!File) {
+                return res.status(400).send({ message: "Missing File" })
+            }
+            if (!userid) {
+                return res.status(400).send({ message: "Missing depandency userid" })
+            }
+            if (!purpose) {
+                return res.status(400).send({ message: "Missing depandecy purpose" })
+            }
+            if (!Path) {
+                return res.status(400).send({ message: "Missing depandecy path" })
+            }
+            const data = result.Report ? result.Report.map((x) => {
+                return {
+                    userid: userid,
+                    name: x.name,
+                    path: x.path,
+                    mimtype: x.mim,
+                    extantion: x.extantion,
+                    purpose: purpose,
+                    size: x.size
+                }
+            }) : []
+            const Response = await UploadedFileData(data)
+            if(!Response.count > 0){
+                return res.status(500).send({message:"Somthing went wrong"})
+            }
+            result.Report.map((x) => {
+               x.url = `${process.env.APP_URL }${x.path}`
+            })
+            console.log(result)
+            return res.status(200).send({message:"success", result:result})
+        } catch (err) {
+            console.log(err)
+            return res.status(500).send({ message: "Internal server error", err: err.message })
+        }
+    }
 }
 
 module.exports = new UserController()
+

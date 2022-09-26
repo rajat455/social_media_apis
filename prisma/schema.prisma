@@ -17,16 +17,36 @@ model user {
   username   String   @db.VarChar(100)
   created_at DateTime @default(now()) @db.Timestamp(0)
   updated_at DateTime @default(now()) @db.Timestamp(0)
-  otp        otp[]
+  files      files[]
 }
 
 model otp {
   id         String   @id @unique @default(uuid())
-  user       user     @relation(fields: [userid], references: [id])
   userid     String
   otp        String   @db.Text
   email      String   @db.VarChar(100)
   created_at DateTime @default(now()) @db.Timestamp(0)
 
   @@index([userid], map: "otp_userid_fkey")
+}
+
+model files {
+  id          String        @id @unique @default(uuid())
+  uploaded_by user          @relation(fields: [userid], references: [id])
+  userid      String
+  name        String        @db.VarChar(20)
+  path        String        @db.VarChar(150)
+  mimtype     String        @db.VarChar(50)
+  extantion   String        @db.VarChar(10)
+  purpose     files_purpose @default(media)
+  size        BigInt
+  created_at  DateTime      @default(now()) @db.Timestamp(0)
+  updated_at  DateTime      @default(now()) @db.Timestamp(0)
+
+  @@index([userid], map: "files_userid_fkey")
+}
+
+enum files_purpose {
+  media
+  send
 }

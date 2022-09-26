@@ -53,6 +53,11 @@ class UserModel {
         })
     }
 
+    async UploadedFileData(data){
+        return await Prisma.files.createMany({
+            data:data
+        })
+    }
 
 }
 
