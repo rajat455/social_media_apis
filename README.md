@@ -13,3 +13,7 @@ people conncetion
 group creation
 group to people conncetion
 upload files
+
+Importent 
+1.all tbl updated at set Attribute
+2.fileid null to required in tbl feeds

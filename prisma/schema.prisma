@@ -22,6 +22,7 @@ model user {
   connection   connection[]
   group        group[]
   group_people group_people[]
+  feeds        feeds[]
 }
 
 model otp {
@@ -48,6 +49,7 @@ model files {
   created_at  DateTime      @default(now()) @db.Timestamp(0)
   updated_at  DateTime      @default(now()) @db.Timestamp(0)
   group       group[]
+  feeds       feeds[]
 
   @@index([userid], map: "files_userid_fkey")
 }
@@ -100,4 +102,15 @@ model group_people {
   lefted_at  DateTime @default(now()) @db.Timestamp(0)
 
   @@unique([joined_by, groupid])
+}
+
+model feeds {
+  id        String   @id @unique @default(uuid())
+  tital     String?  @db.VarChar(100)
+  desc      String?  @db.Text
+  user      user     @relation(fields: [posted_by], references: [id])
+  posted_by String
+  file      files?   @relation(fields: [fileid], references: [id])
+  fileid   String?
+  posted_at DateTime @default(now()) @db.Timestamp(0)
 }
