@@ -7,3 +7,9 @@ PORT=5000
 APP_URL='http://localhost:5000'
 JWT_SECRATE="somthing"
 EMAIL="rajatjayswal80@gmail.com"
+
+
+people conncetion 
+group creation
+group to people conncetion
+upload files

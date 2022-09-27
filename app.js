@@ -4,6 +4,7 @@ const http = require("http")
 const socketIo = require("socket.io")
 const UserRouter = require("./User/Router")
 const fileupload = require("express-fileupload")
+const ConRouter = require("./Connection/ConRouter")
 require("dotenv").config()
 
 
@@ -19,11 +20,11 @@ app.use(fileupload())
 app.use("/uploads",express.static("./uploads") )
 
 app.use("/api/user", UserRouter)
+app.use("/api/con", ConRouter)
 
 app.get("/", (req, res) => {
     return res.status(200).send({ message: "Success" })
 })
-
 
 
 server.listen(PORT, () => {

@@ -8,17 +8,20 @@ datasource db {
 }
 
 model user {
-  id         String   @id @unique @default(uuid())
-  first_name String   @db.VarChar(50)
-  last_name  String   @db.VarChar(50)
-  email      String   @unique @db.VarChar(100)
-  phone      String?  @db.VarChar(10)
-  password   String?  @db.Text
-  username   String   @db.VarChar(100)
-  created_at DateTime @default(now()) @db.Timestamp(0)
-  updated_at DateTime @default(now()) @db.Timestamp(0)
-  files      files[]
-  otp        otp[]
+  id           String         @id @unique @default(uuid())
+  first_name   String         @db.VarChar(50)
+  last_name    String         @db.VarChar(50)
+  email        String         @unique @db.VarChar(100)
+  phone        String?        @db.VarChar(10)
+  password     String?        @db.Text
+  username     String         @db.VarChar(100)
+  created_at   DateTime       @default(now()) @db.Timestamp(0)
+  updated_at   DateTime       @default(now()) @db.Timestamp(0)
+  files        files[]
+  otp          otp[]
+  connection   connection[]
+  group        group[]
+  group_people group_people[]
 }
 
 model otp {
@@ -44,6 +47,7 @@ model files {
   size        BigInt
   created_at  DateTime      @default(now()) @db.Timestamp(0)
   updated_at  DateTime      @default(now()) @db.Timestamp(0)
+  group       group[]
 
   @@index([userid], map: "files_userid_fkey")
 }
@@ -51,4 +55,49 @@ model files {
 enum files_purpose {
   media
   send
+}
+
+model connection {
+  id            String          @id @unique @default(uuid())
+  requested_by  String          @db.VarChar(100)
+  accepted_user user            @relation(fields: [accepted_by], references: [id])
+  accepted_by   String          @db.VarChar(100)
+  con_status    connection_type @default(pending)
+  created_at    DateTime        @default(now()) @db.Timestamp(0)
+  updated_at    DateTime        @default(now()) @db.Timestamp(0)
+
+  @@unique([requested_by, accepted_by])
+}
+
+enum connection_type {
+  pending
+  accept
+  block
+}
+
+model group {
+  id           String         @id @unique @default(uuid())
+  name         String
+  admin        user           @relation(fields: [created_by], references: [id])
+  created_by   String
+  created_at   DateTime       @default(now()) @db.Timestamp(0)
+  updated_at   DateTime       @default(now()) @db.Timestamp(0)
+  icon         files?         @relation(fields: [iconid], references: [id])
+  iconid       String?
+  group_people group_people[]
+}
+
+model group_people {
+  id         String   @id @unique @default(uuid())
+  user       user     @relation(fields: [joined_by], references: [id])
+  joined_by  String   @db.VarChar(100)
+  invited_by String
+  is_joined  Boolean  @default(true)
+  is_admin   Boolean  @default(false)
+  group      group    @relation(fields: [groupid], references: [id])
+  groupid    String   @db.VarChar(100)
+  joined_at  DateTime @default(now()) @db.Timestamp(0)
+  lefted_at  DateTime @default(now()) @db.Timestamp(0)
+
+  @@unique([joined_by, groupid])
 }
