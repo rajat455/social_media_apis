@@ -111,6 +111,6 @@ model feeds {
   user      user     @relation(fields: [posted_by], references: [id])
   posted_by String
   file      files?   @relation(fields: [fileid], references: [id])
-  fileid   String? @unique
+  fileid    String   @unique
   posted_at DateTime @default(now()) @db.Timestamp(0)
 }

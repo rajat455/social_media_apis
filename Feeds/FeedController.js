@@ -7,12 +7,16 @@ class FeedController {
     async AddNewPost(req, res) {
         try {
             const { tital, desc, fileids, posted_by } = req.body
+
+            if(!fileids.length > 0){
+                return res.status(400).send({message:"Missing depandency fileids"})
+            }
             let Data = fileids && fileids.length > 0 ? fileids.map((x) => {
                 return {
                     tital: tital || undefined,
                     desc: desc || undefined,
                     posted_by: posted_by,
-                    fileid: x || undefined
+                    fileid: x
                 }
             }) : null
 
