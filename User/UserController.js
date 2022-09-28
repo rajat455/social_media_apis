@@ -1,4 +1,4 @@
-const { addNew, NewOtp, GetUser, isEmailExist, UploadedData, UploadedFileData } = require("./UserModel")
+const { addNew, NewOtp, GetUser, isEmailExist, UploadedData, UploadedFileData, GetFileWithName } = require("./UserModel")
 var randomstring = require("randomstring");
 const bcrypt = require('bcrypt');
 const { newEmail } = require("../Email/SendEmail");
@@ -138,16 +138,21 @@ class UserController {
                 }
             }) : []
             const Response = await UploadedFileData(data)
-            if(!Response.count > 0){
-                return res.status(500).send({message:"Somthing went wrong"})
+            if (!Response.count > 0) {
+                return res.status(500).send({ message: "Somthing went wrong" })
             }
-            result.Report.map((x) => {
-               x.url = `${process.env.APP_URL }${x.path}`
+            let names = result.Report.map((x) => {
+                return x.name
             })
-            console.log(result)
-            return res.status(200).send({message:"success", result:result})
+            const FindedResult = await GetFileWithName(names)
+            if (FindedResult) {
+                const output = FindedResult.map((x) => {
+                    return { ...x, url: `${process.env.APP_URL}${x.path}` }
+                })
+                return res.status(200).send({ message: "success", result: output })
+            }
+            return res.status(500).send({message:"Somthing went wrong"})
         } catch (err) {
-            console.log(err)
             return res.status(500).send({ message: "Internal server error", err: err.message })
         }
     }

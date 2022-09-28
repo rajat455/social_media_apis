@@ -68,9 +68,57 @@ class ConModel {
                 is_admin: status,
             },
             where: {
-                id:join_id
+                id: join_id
             }
         })
+    }
+    async GetConnectedPeoples(userid) {
+        const GetWithRequested = await Prisma.connection.findMany({
+            select: {
+                accepted_by: true
+            },
+            where: {
+                requested_by: userid,
+                con_status: "accept"
+            }
+        })
+        const GetWithAccepted = await Prisma.connection.findMany({
+            select: {
+                requested_by: true
+            },
+            where: {
+                accepted_by: userid,
+                con_status: "accept"
+            }
+        })
+        return [...GetWithAccepted || undefined, ...GetWithRequested || undefined]
+    }
+
+    async GetSuggations(userids){
+        const GetWithRequested = await Prisma.connection.findMany({
+            select:{
+                accepted_by:true
+            },
+            where:{
+                requested_by:{
+                    in:userids
+                },
+                con_status:"accept"
+            }
+        })
+        const GetWithAccepted = await Prisma.connection.findMany({
+            select:{
+                requested_by:true
+            },
+            where:{
+                accepted_by:{
+                    in:userids
+                },
+                con_status:"accept"
+            }
+        })
+
+        return [...GetWithAccepted || undefined, ...GetWithRequested || undefined]
     }
 }
 

@@ -55,7 +55,22 @@ class UserModel {
 
     UploadedFileData(data) {
         return Prisma.files.createMany({
-            data: data
+            data: data,
+        })
+    }
+
+    GetFileWithName(names){
+        return Prisma.files.findMany({
+            select:{
+                id:true,
+                path:true,
+                mimtype:true
+            },
+            where:{
+                name:{
+                    in:names
+                }
+            }
         })
     }
 
